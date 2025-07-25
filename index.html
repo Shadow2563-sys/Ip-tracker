@@ -36,7 +36,7 @@
       background: #00f0ff;
       border: none;
       padding: 10px 18px;
-      margin-top: 15px;
+      margin: 10px;
       font-weight: bold;
       cursor: pointer;
       color: #000;
@@ -90,12 +90,14 @@
        ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝╚═╝╚═╝ ╚═════╝ ╚═╝╚═╝╚═╝
 
           [ OBLIVION IP Tracker ]
-        Created by: Vortex Shadow
+        Tested by: Vortex Shadow
   </pre>
 
-  <h2>Enter Target IP</h2>
+  <h2>Enter Target IP (or leave blank for your IP)</h2>
   <input type="text" id="ipInput" placeholder="Enter IP Address">
+  <br>
   <button onclick="lookupIP()">Trace</button>
+  <button onclick="downloadReport()">Download Report</button>
 
   <div class="output" id="output">Awaiting target...</div>
 
@@ -104,18 +106,30 @@
   </footer>
 
   <script>
+    let lastReport = "";
+
     async function lookupIP() {
-      const ip = document.getElementById('ipInput').value.trim();
+      const ipField = document.getElementById('ipInput');
+      const ip = ipField.value.trim();
       const output = document.getElementById('output');
 
-      if (!ip) {
-        output.textContent = "⚠️ Enter a valid IP first.";
-        return;
+      output.textContent = "🔍 Initializing OBLIVION Trace...";
+
+      let targetIP = ip;
+      if (!targetIP) {
+        try {
+          const ipRes = await fetch('https://api.ipify.org?format=json');
+          const ipJson = await ipRes.json();
+          targetIP = ipJson.ip;
+          ipField.value = targetIP;
+        } catch {
+          output.textContent = "❌ Failed to auto-detect IP.";
+          return;
+        }
       }
 
-      output.textContent = "🔍 Initializing OBLIVION Trace...";
       try {
-        const res = await fetch(`https://ipapi.co/${ip}/json/`);
+        const res = await fetch(`https://ipapi.co/${targetIP}/json/`);
         const data = await res.json();
 
         if (data.error) {
@@ -123,7 +137,7 @@
           return;
         }
 
-        const info = `
+        lastReport = `
 [ OBLIVION IP REPORT ]
 
 IP Address     : ${data.ip || 'N/A'}
@@ -144,10 +158,26 @@ Calling Code   : +${(data.country_calling_code || '').replace('+', '') || 'N/A'}
 Google Maps    : https://maps.google.com/?q=${data.latitude},${data.longitude}
         `;
 
-        output.textContent = info;
+        output.textContent = lastReport;
       } catch (err) {
         output.textContent = "❌ OBLIVION Trace Failed: " + err.message;
       }
+    }
+
+    function downloadReport() {
+      if (!lastReport) {
+        alert("No report available. Run a trace first!");
+        return;
+      }
+      const blob = new Blob([lastReport], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'OBLIVION_IP_Report.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
   </script>
 </body>
