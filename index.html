@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OBLIVION IP Tracker</title>
+  <style>
+    body {
+      background: radial-gradient(circle at center, #050505 0%, #000000 100%);
+      color: #9effff;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    h1, h2 {
+      text-shadow: 0 0 25px #00f0ff, 0 0 60px #0044ff;
+    }
+    pre {
+      color: #6ff9ff;
+      font-size: 14px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 5px #00f0ff;
+    }
+    input {
+      background: #0a0f1e;
+      color: #00f0ff;
+      border: 1px solid #00f0ff;
+      padding: 10px;
+      width: 260px;
+      margin-top: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px #0044ff;
+    }
+    button {
+      background: #00f0ff;
+      border: none;
+      padding: 10px 18px;
+      margin-top: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s ease-in-out;
+    }
+    button:hover {
+      background: #0077ff;
+      box-shadow: 0 0 20px #00f0ff, 0 0 40px #0044ff;
+      transform: scale(1.1);
+    }
+    .output {
+      text-align: left;
+      max-width: 500px;
+      margin: 20px auto;
+      background: #0b0c10;
+      padding: 15px;
+      border: 1px solid #00f0ff;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      box-shadow: 0 0 20px #003355;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 15px #003355; }
+      50% { box-shadow: 0 0 35px #00f0ff; }
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #555;
+      text-shadow: 0 0 5px #0044ff;
+    }
+    a {
+      color: #00f0ff;
+      text-decoration: none;
+    }
+    a:hover {
+      color: #0077ff;
+    }
+  </style>
+</head>
+<body>
+  <pre>
+       ██████╗ ██████╗ ██╗     ██╗██╗██╗ ██████╗ ██╗██╗██╗
+      ██╔═══██╗██╔══██╗██║     ██║██║██║██╔═══██╗██║██║██║
+      ██║   ██║██████╔╝██║     ██║██║██║██║   ██║██║██║██║
+      ██║   ██║██╔══██╗██║     ██║██║██║██║   ██║██║██║██║
+      ╚██████╔╝██║  ██║███████╗██║██║██║╚██████╔╝██║██║██║
+       ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝╚═╝╚═╝ ╚═════╝ ╚═╝╚═╝╚═╝
+
+          [ OBLIVION IP Tracker ]
+        Tested by: Vortex Shadow
+  </pre>
+
+  <h2>Enter Target IP</h2>
+  <input type="text" id="ipInput" placeholder="Enter IP Address">
+  <button onclick="lookupIP()">Trace</button>
+
+  <div class="output" id="output">Awaiting target...</div>
+
+  <footer>
+    &copy; 2025 OBLIVION Tools | <a href="#">Shadow Syndicate</a>
+  </footer>
+
+  <script>
+    async function lookupIP() {
+      const ip = document.getElementById('ipInput').value.trim();
+      const output = document.getElementById('output');
+
+      if (!ip) {
+        output.textContent = "⚠️ Enter a valid IP first.";
+        return;
+      }
+
+      output.textContent = "🔍 Initializing OBLIVION Trace...";
+      try {
+        const res = await fetch(`https://ipapi.co/${ip}/json/`);
+        const data = await res.json();
+
+        if (data.error) {
+          output.textContent = `❌ Error: ${data.reason || 'Unable to fetch data'}`;
+          return;
+        }
+
+        const info = `
+[ OBLIVION IP REPORT ]
+
+IP Address     : ${data.ip || 'N/A'}
+City           : ${data.city || 'N/A'}
+Region         : ${data.region || 'N/A'}
+Country        : ${data.country_name || 'N/A'}
+Latitude       : ${data.latitude || 'N/A'}
+Longitude      : ${data.longitude || 'N/A'}
+Time Zone      : ${data.timezone || 'N/A'}
+Postal Code    : ${data.postal || 'N/A'}
+ISP            : ${data.org || 'N/A'}
+ASN            : ${data.asn || 'N/A'}
+Country Code   : ${data.country || 'N/A'}
+Currency       : ${data.currency || 'N/A'}
+Languages      : ${data.languages || 'N/A'}
+Calling Code   : +${(data.country_calling_code || '').replace('+', '') || 'N/A'}
+
+Google Maps    : https://maps.google.com/?q=${data.latitude},${data.longitude}
+        `;
+
+        output.textContent = info;
+      } catch (err) {
+        output.textContent = "❌ OBLIVION Trace Failed: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
